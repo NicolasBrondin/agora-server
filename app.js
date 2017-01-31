@@ -8,7 +8,8 @@ var cors = require('cors');
 var rooms = [
     {name:"World", level: 0},
     {name:"France", level:1, position: {lat:47.052705, long: 2.766922, radius: 300000 } },  
-    {name:"Marçay", level:2, position: {lat:46.470203, long: 0.226018, radius: 4000 } }
+    {name:"Marçay", level:2, position: {lat:46.470203, long: 0.226018, radius: 4000 } },
+    {name:"Limoges", level:2, position: {lat:45.854794, long: 1.247002, radius: 6000 } } //, 
 ];
 
 
