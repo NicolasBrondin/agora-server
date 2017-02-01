@@ -25,7 +25,7 @@ app.use(cors());
 app.get('/rooms/lat/:lat/long/:long', function(req, res){
     var available = rooms.filter(function(room){
         if(room.position) {
-        console.log(room.name, room.position.lat, req.params.lat, room.position.long, req.params.long);
+        console.log(room.display_name, room.position.lat, req.params.lat, room.position.long, req.params.long);
         console.log(calculate_distance(room.position.lat, room.position.long,  parseFloat(req.params.lat),  parseFloat(req.params.long)));
         }
         return room.level == 0 || calculate_distance(room.position.lat, room.position.long, parseFloat(req.params.lat), parseFloat(req.params.long)) < room.position.radius;
