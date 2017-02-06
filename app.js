@@ -20,6 +20,18 @@ function calculate_distance(long1,lat1,long2 , lat2) {
     return d;
 } // CalculateDistance
 
+function find_room(code){
+    return rooms.find(function(room){ return room.code === code;});
+};
+
+function pop_client_room(socket){
+    var r = rooms.find(function(room){ return room.users.indexOf(socket) != -1 ? true : false});
+    console.log(r);
+    r.users.splice(r.users.indexOf(socket),1);
+    return r;
+    
+};
+
 app.use(cors());
 
 app.get('/rooms/lat/:lat/long/:long', function(req, res){
@@ -34,27 +46,37 @@ app.get('/rooms/lat/:lat/long/:long', function(req, res){
 });
 
 io.on('connection', function(socket){
-    
-  var default_room = 'World';
 
-  //Emit the rooms array
-  socket.emit('setup');
+    //Emit the rooms array
+    socket.emit('setup');
+
+    //Listens for new user
+    socket.on('setup', function(data) {
+        var r = find_room(data.room);
+        socket.join(data.room);
+        r.users.push(socket);
+        socket.emit('room update', {users: r.users.length});
+        socket.broadcast.to(data.room).emit('user joined', data);
+    });
+
+    socket.on('chat message', function(data){
+        var r = find_room(data.room);
+        r.messages.push(data);
+        socket.broadcast.to(data.room).emit('chat message', data);
+    });
     
-  //Listens for new user
-  socket.on('setup', function(data) {
-    socket.join(data.room);
-    io.in(data.room).emit('user joined', data);
-  });
-    
-  socket.on('chat message', function(data){
-      io.in(data.room).emit('chat message', data);
-  });
+    socket.on('disconnect', function(data){
+        var r = pop_client_room(socket);
+        
+        io.in(r.code).emit('user left', {});
+    });
 
 });
 
 var port = process.env.PORT || 3000;
+
 http.listen(port, function(){
-  console.log('listening on port: '+ port);
+    console.log('listening on port: '+ port);
 });
 
 /*
