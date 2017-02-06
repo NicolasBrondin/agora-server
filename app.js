@@ -55,12 +55,15 @@ io.on('connection', function(socket){
         var r = find_room(data.room);
         socket.join(data.room);
         r.users.push(socket);
-        socket.emit('room update', {users: r.users.length});
+        socket.emit('room update', {users: r.users.length, messages: r.messages});
         socket.broadcast.to(data.room).emit('user joined', data);
     });
 
     socket.on('chat message', function(data){
         var r = find_room(data.room);
+        if(r.messages.length > 99){
+            r.messages.splice(0,1);   
+        }
         r.messages.push(data);
         socket.broadcast.to(data.room).emit('chat message', data);
     });
